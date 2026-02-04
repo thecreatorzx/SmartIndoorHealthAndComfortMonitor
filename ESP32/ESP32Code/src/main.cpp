@@ -6,19 +6,35 @@
 #include <Arduino.h> // Essential for analogRead, Serial, etc.
 
 
-#include <Arduino.h>
+
+#include "sensors.h"
+#include "network.h"
+#include "payload.h"
+#include "config.h"
+
+unsigned long lastUpload = 0;
 
 void setup() {
-  Serial.begin(115200);   // Must match JSON baudrate
-  delay(1000);            // Wait for terminal to initialize
+    Serial.begin(115200);
+    initWiFi();
+    initSensors();
 }
 
 void loop() {
-  int potValue = analogRead(34);               // Read potentiometer
-  float voltage = potValue * (3.3 / 4095.0);   // Convert 12-bit ADC to voltage
-  Serial.print("Raw: ");
-  Serial.print(potValue);
-  Serial.print("\tVoltage: ");
-  Serial.println(voltage, 2);
-  delay(500);                                   // 0.5s update
+    readTempHumidity();
+    readCO2();
+
+    // Noise aggregation
+    if (millis() - lastUpload % NOISE_AGG_INTERVAL < 50) {
+        readNoiseLevel();
+    }
+
+    if (millis() - lastUpload > UPLOAD_INTERVAL) {
+        SensorData data = getSensorData();
+        String payload = createPayload(data);
+        Serial.println(payload); // debug
+        sendData(payload);
+        lastUpload = millis();
+    }
 }
+
