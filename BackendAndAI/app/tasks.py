@@ -7,7 +7,8 @@ from app.crud import (
     get_latest_reading, 
     create_alert, 
     get_active_alerts,
-    update_alert_status
+    update_alert_status,
+    get_all_devices
 )
 from app.schemas import Alert
 import logging
@@ -57,9 +58,18 @@ async def monitor_readings(devices: list = None):
     """
     Monitors all devices and triggers alerts based on thresholds
     Runs as background task (typically every 1-5 minutes)
+    If devices not provided, fetches all active devices from database
     """
     if devices is None:
-        devices = ["ESP32_001", "ESP32_002", "ESP32_003"]
+        try:
+            devices = await get_all_devices()
+            if not devices:
+                logger.warning("No active devices found to monitor")
+                return
+            logger.debug(f"Monitoring {len(devices)} devices")
+        except Exception as e:
+            logger.error(f"Error fetching device list: {type(e).__name__}: {str(e)}")
+            return
     
     for device_id in devices:
         try:
@@ -89,6 +99,7 @@ async def monitor_readings(devices: list = None):
             else:
                 # Resolve high_co2 alert if CO2 is now normal
                 await resolve_alert_if_normal(device_id, "high_co2", active_types)
+                await resolve_alert_if_normal(device_id, "critical_co2", active_types)
             
             # Check temperature
             if reading["temperature"] > THRESHOLDS["high_temperature"]["value"]:
