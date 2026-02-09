@@ -6,10 +6,10 @@ readings_table = Table(
     metadata,
     Column("id", Integer, primary_key=True, index=True),
     Column("device_id", String, index=True, nullable=False),
-    Column("temperature", Float, nullable=False, CheckConstraint('temperature >= -50 AND temperature <= 50')),
-    Column("humidity", Float, nullable=False, CheckConstraint('humidity >= 0 AND humidity <= 100')),
-    Column("co2", Integer, nullable=False, CheckConstraint('co2 >= 400 AND co2 <= 5000')),
-    Column("noise", Float, nullable=False, CheckConstraint('noise >= 0 AND noise <= 150'))
+    Column("temperature", Float, nullable=False),
+    Column("humidity", Float, nullable=False),
+    Column("co2", Integer, nullable=False),
+    Column("noise", Float, nullable=False),
     Column("timestamp", DateTime, nullable=False),
 )
 # Alerts Table

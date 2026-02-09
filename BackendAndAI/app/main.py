@@ -2,21 +2,36 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from app.logging_config import setup_logging
+from fastapi.middleware.cors import CORSMiddleware
+import logging
+
 
 setup_logging(log_level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 from app.routers import ingest, latest, history, insights, alerts
 from app.database import database
 from app.tasks import monitor_readings
 import asyncio
-import logging
 import time
 
 # Setup logging configuration
 
+
 app = FastAPI(title = "Smart Indoor Health and Comfort Monitor API")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",    # No trailing slash
+        "http://127.0.0.1:5173",    # Local IP version
+        "http://localhost:3000",
+    ],
+    allow_credentials=True,         # Recommended for Axios
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Initialize app state for monitoring task
 app.state.monitoring_task = None
 

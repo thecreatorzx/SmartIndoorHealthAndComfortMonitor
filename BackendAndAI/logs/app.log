@@ -1,0 +1,78 @@
+2026-02-06 18:50:58,329 - root - INFO - Logging configured successfully
+2026-02-06 18:51:04,569 - root - INFO - Logging configured successfully
+2026-02-06 18:51:52,030 - root - INFO - Logging configured successfully
+2026-02-06 18:51:56,264 - root - INFO - Logging configured successfully
+2026-02-06 18:51:57,768 - root - INFO - Logging configured successfully
+2026-02-06 18:52:03,603 - root - INFO - Logging configured successfully
+2026-02-06 18:52:05,122 - root - INFO - Logging configured successfully
+2026-02-06 18:52:32,976 - root - INFO - Logging configured successfully
+2026-02-06 18:52:36,579 - root - INFO - Logging configured successfully
+2026-02-06 18:52:36,811 - app.config - INFO - Environment variables loaded successfully
+2026-02-06 18:52:36,811 - app.config - WARNING - Using default API key - this is insecure for production. Set API_KEY environment variable.
+2026-02-06 18:52:36,944 - app.main - INFO - Database connected successfully
+2026-02-06 18:52:36,945 - app.main - INFO - Alert monitoring started
+2026-02-06 18:54:23,276 - app.main - INFO - Incoming POST /api/ingest from 127.0.0.1
+2026-02-06 18:54:23,290 - app.routers.ingest - INFO - Reading ingested successfully for device ESP32_001
+2026-02-06 18:54:23,291 - app.main - INFO - Response 200 for POST /api/ingest - 0.015s
+2026-02-06 18:55:00,433 - app.main - INFO - Incoming GET /api/latest from 127.0.0.1
+2026-02-06 18:55:00,439 - app.main - INFO - Response 200 for GET /api/latest - 0.006s
+2026-02-06 18:55:13,424 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 18:55:13,430 - app.main - INFO - Response 200 for GET /api/history - 0.007s
+2026-02-06 18:55:31,734 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 18:55:31,735 - app.routers.history - WARNING - Invalid date format for device ESP32_001: start=2026-02-05T00:00:00, end=2026-02-05T23:59:59 Expected: 200 Response: Only ESP32_002 readings
+2026-02-06 18:55:31,735 - app.main - INFO - Response 400 for GET /api/history - 0.001s
+2026-02-06 18:55:36,663 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 18:55:36,664 - app.routers.history - WARNING - Invalid date format for device ESP32_002: start=2026-02-05T00:00:00, end=2026-02-05T23:59:59 Expected: 200 Response: Only ESP32_002 readings
+2026-02-06 18:55:36,664 - app.main - INFO - Response 400 for GET /api/history - 0.001s
+2026-02-06 18:55:41,476 - app.main - INFO - Incoming GET /api/latest from 127.0.0.1
+2026-02-06 18:55:41,488 - app.main - INFO - Response 200 for GET /api/latest - 0.012s
+2026-02-06 18:55:43,490 - app.main - INFO - Incoming GET /api/latest from 127.0.0.1
+2026-02-06 18:55:43,496 - app.main - INFO - Response 200 for GET /api/latest - 0.006s
+2026-02-06 18:55:54,515 - app.main - INFO - Incoming GET /api/insights from 127.0.0.1
+2026-02-06 18:55:54,528 - app.main - INFO - Response 200 for GET /api/insights - 0.013s
+2026-02-06 18:55:57,941 - app.main - INFO - Incoming GET /api/insights from 127.0.0.1
+2026-02-06 18:55:57,946 - app.main - INFO - Response 200 for GET /api/insights - 0.005s
+2026-02-06 18:56:02,462 - app.main - INFO - Incoming GET /api/insights from 127.0.0.1
+2026-02-06 18:56:02,467 - app.main - INFO - Response 422 for GET /api/insights - 0.005s
+2026-02-06 18:56:14,161 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 18:56:14,162 - app.routers.history - WARNING - Invalid date format for device ESP32_00`: start=2026-02-05T00:00:00, end=2026-02-05T23:59:59 Expected: 200 Response: Only ESP32_002 readings
+2026-02-06 18:56:14,162 - app.main - INFO - Response 400 for GET /api/history - 0.001s
+2026-02-06 18:56:18,559 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 18:56:18,559 - app.routers.history - WARNING - Invalid date format for device ESP32_001: start=2026-02-05T00:00:00, end=2026-02-05T23:59:59 Expected: 200 Response: Only ESP32_002 readings
+2026-02-06 18:56:18,560 - app.main - INFO - Response 400 for GET /api/history - 0.001s
+2026-02-06 18:56:22,817 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 18:56:22,818 - app.routers.history - WARNING - Invalid date format for device ESP32_002: start=2026-02-05T00:00:00, end=2026-02-05T23:59:59 Expected: 200 Response: Only ESP32_002 readings
+2026-02-06 18:56:22,818 - app.main - INFO - Response 400 for GET /api/history - 0.001s
+2026-02-06 18:56:29,764 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 18:56:29,772 - app.main - INFO - Response 200 for GET /api/history - 0.007s
+2026-02-06 18:56:33,277 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 18:56:33,283 - app.main - INFO - Response 200 for GET /api/history - 0.006s
+2026-02-06 19:00:55,072 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 19:00:55,083 - app.main - INFO - Response 200 for GET /api/history - 0.011s
+2026-02-06 19:00:55,093 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 19:00:55,102 - app.main - INFO - Response 200 for GET /api/history - 0.009s
+2026-02-06 19:00:59,606 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 19:00:59,614 - app.main - INFO - Response 200 for GET /api/history - 0.007s
+2026-02-06 19:01:08,099 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 19:01:08,113 - app.main - INFO - Response 200 for GET /api/history - 0.012s
+2026-02-06 19:01:08,126 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 19:01:08,137 - app.main - INFO - Response 200 for GET /api/history - 0.011s
+2026-02-06 19:02:23,864 - app.main - INFO - Database disconnected and monitoring stopped
+2026-02-06 19:02:23,864 - app.main - INFO - Monitoring task cancelled
+2026-02-06 19:02:24,609 - root - INFO - Logging configured successfully
+2026-02-06 19:02:24,878 - app.config - INFO - Environment variables loaded successfully
+2026-02-06 19:02:24,879 - app.config - WARNING - Using default API key - this is insecure for production. Set API_KEY environment variable.
+2026-02-06 19:02:24,948 - app.main - INFO - Database connected successfully
+2026-02-06 19:02:24,948 - app.main - INFO - Alert monitoring started
+2026-02-06 19:02:30,054 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 19:02:30,069 - app.main - INFO - Response 200 for GET /api/history - 0.015s
+2026-02-06 19:02:30,080 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 19:02:30,093 - app.main - INFO - Response 200 for GET /api/history - 0.013s
+2026-02-06 19:03:45,797 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 19:03:45,807 - app.main - INFO - Response 200 for GET /api/history - 0.011s
+2026-02-06 19:03:45,818 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 19:03:45,826 - app.main - INFO - Response 200 for GET /api/history - 0.008s
+2026-02-06 19:04:01,693 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 19:04:01,700 - app.main - INFO - Response 200 for GET /api/history - 0.007s
+2026-02-06 19:04:02,595 - app.main - INFO - Incoming GET /api/history from 127.0.0.1
+2026-02-06 19:04:02,602 - app.main - INFO - Response 200 for GET /api/history - 0.006s
