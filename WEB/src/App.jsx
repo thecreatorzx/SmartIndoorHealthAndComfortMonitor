@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import './App.css'
+import Header from './components/Header.jsx'
 
 function App() {
   let server = import.meta.env.VITE_SERVER_URL || 'http://127.0.0.1:8000/api'
@@ -24,9 +25,7 @@ function App() {
   return (
     <>
       <div className="App">
-        <h1 className="text-3xl font-bold underline">
-          Smart Indoor Health and Comfort Monitor
-        </h1>
+        <Header />
         <p>Backend Server: {server}</p>
         <button onClick={fetchData} className="mt-4 px-4 py-2 bg-blue-500 text-black rounded hover:bg-blue-600">
           Fetch Data
