@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import './App.css'
 import Header from './components/Header.jsx'
+import Main from './components/Main.jsx'
 
 function App() {
   let server = import.meta.env.VITE_SERVER_URL || 'http://127.0.0.1:8000/api'
@@ -24,14 +25,13 @@ function App() {
 
   return (
     <>
-      <div className="App">
+      <div className="App w-screen h-screen bg-gray-100 flex flex-col items-center text-gray-700">
         <Header />
+        <Main data={data} />
         <p>Backend Server: {server}</p>
-        <button onClick={fetchData} className="mt-4 px-4 py-2 bg-blue-500 text-black rounded hover:bg-blue-600">
+        <button onClick={fetchData} className="bg-blue-500 text-gray-600 rounded hover:bg-blue-600">
           Fetch Data
         </button>
-        <p>Data fetched successfully!</p>
-        {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
       </div>
     </>
   )
