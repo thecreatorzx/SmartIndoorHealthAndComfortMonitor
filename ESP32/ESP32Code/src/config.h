@@ -27,8 +27,8 @@
 #define NOISE_SAMPLES 100
 
 // Network
-#define WIFI_SSID "your_ssid"
-#define WIFI_PASS "your_password"
+#define WIFI_SSID "test"
+#define WIFI_PASS "test1234"
 #define API_ENDPOINT "http://your_backend_endpoint/data"
 
 #endif

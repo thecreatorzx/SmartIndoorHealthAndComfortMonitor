@@ -1,11 +1,21 @@
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+
 #root {
   max-width: 1280px;
   text-align: center;
 }
-button {
-  cursor: pointer;
-}
 @import "tailwindcss";
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
