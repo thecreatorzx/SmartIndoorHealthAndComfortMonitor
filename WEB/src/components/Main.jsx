@@ -7,9 +7,9 @@ import Insights from './Insights.jsx';
 import Settings from './Settings.jsx';
 import Summary from './Summary.jsx';
 import DeviceInfo from './DeviceInfo.jsx';
-import Recent from './Recent.jsx';
+import AlertsNotification from './AlertsNotification.jsx';
 
-const Main = ({ data }) => {
+const Main = () => {
   return (
     <div className="w-full h-full bg-gray-100 px-6 lg:px-10">
         <Hero />
@@ -19,7 +19,7 @@ const Main = ({ data }) => {
         <Settings />
         <Summary />
         <DeviceInfo/>
-        <Recent />
+        <AlertsNotification />
         <Footer />
     </div>
   )
