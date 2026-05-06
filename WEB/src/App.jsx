@@ -35,7 +35,7 @@ function App() {
     console.error("Logout failed:", err);
   } finally {
     setUser(null);
-    Navigate("/");
+    navigate("/");
   }
 };
   if (loading) return <div>Loading...</div>
@@ -56,7 +56,7 @@ function App() {
         } />
         <Route path = "/dashboard" element= {
           <ProtectedRoute user = {user}>
-            <div className="App w-screen bg-gray-100 flex flex-col items-center text-gray-700">
+            <div className="App w-screen bg-gray-100 flex flex-col items-stretch text-gray-700">
               <Header user={user} onLogout={handleLogout}/>
               <Main />
             </div>

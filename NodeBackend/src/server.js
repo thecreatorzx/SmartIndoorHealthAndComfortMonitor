@@ -4,44 +4,60 @@ import { Server } from "socket.io";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
 
-import { setupESP32 } from "./sockets/esp32.js";
-import { setupSocketIO } from "./sockets/socketio.js";
+import { setupESP32 } from "./sockets/esp32.socket.js";
+import { setupSocketIO } from "./sockets/socketio.socket.js";
 import { state } from "./state/state.js";
-import deviceRouter from "./routes/devices.js";
-import authRouter from "./routes/auth.js";
-import { authMiddleware } from "./middleware/auth.js";
+import deviceRouter from "./routes/devices.route.js";
+import authRouter from "./routes/auth.routes.js";
+import { authMiddleware } from "./middleware/auth.middleware.js";
+import { authSocket } from "./middleware/auth.middleware.js";
+import { table_setup } from "./config/db.js";
+import { startDigestScheduler } from "./schedulers/digest.scheduler.js";
+import { startAlertScheduler } from "./schedulers/alert.scheduler.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 import cors from "cors";
+import helmet from "helmet";
 
 const PORT = process.env.PORT || 3000;
 const ESP_PATH = process.env.ESP_PATH || "/esp32";
 
 const app = express();
+app.use(helmet());
 const server = createServer(app);
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: CLIENT_ORIGIN,
     credentials: true,
   }),
+);
+app.get("/health", (req, res) =>
+  res.json({ status: "ok", uptime: process.uptime() }),
 );
 app.use("/auth", authRouter);
 app.use(authMiddleware);
 app.use("/devices", deviceRouter);
+app.use(errorHandler);
 
+await table_setup();
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: CLIENT_ORIGIN,
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
 setupESP32(server, io, ESP_PATH);
-setupSocketIO(io);
 
-// ✅ timeout monitor — checks all connected devices
+io.use(authSocket);
+setupSocketIO(io);
+startAlertScheduler(io);
+startDigestScheduler(io);
+
 const TIMEOUT = 10000;
 setInterval(() => {
   const now = Date.now();

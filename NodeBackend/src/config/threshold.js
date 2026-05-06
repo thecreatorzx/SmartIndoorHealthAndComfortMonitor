@@ -1,5 +1,3 @@
-// thresholds.js
-
 const THRESHOLDS = {
   temperature: {
     warning: { min: 18, max: 30 },
@@ -9,7 +7,7 @@ const THRESHOLDS = {
     warning: { min: 30, max: 70 },
     critical: { min: 20, max: 85 },
   },
-  co2: {
+  air_quality: {
     warning: { max: 1000 },
     critical: { max: 2500 },
   },
@@ -31,7 +29,7 @@ const THRESHOLDS = {
   },
 };
 
-function getSeverity(field, value) {
+export function getSeverity(field, value) {
   const t = THRESHOLDS[field];
   if (!t) return null;
 
@@ -49,23 +47,13 @@ function getSeverity(field, value) {
   return null;
 }
 
-// Returns an object like:
-// {
-//   temperature: "warning",
-//   co2: "critical",
-//   humidity: null,   ← null means within safe range
-//   noise: null,
-//   uv: null,
-//   light: null,
-//   pressure: null
-// }
 export function checkThresholds(reading) {
   const result = {};
 
   for (const field of [
     "temperature",
     "humidity",
-    "co2",
+    "air_quality",
     "noise",
     "uv",
     "light",

@@ -22,9 +22,9 @@ const DeviceInfo = () => {
       bg: connected ? "bg-green-100" : "bg-red-100",
       color: connected ? "text-green-500" : "text-red-500",
       rows: [
-        { label: "Last Update",   value: getTimeSince(lastSeen)              },
-        { label: "Device Code",   value: deviceInfo?.device_code   ?? "N/A"  },
-        { label: "Location",      value: deviceInfo?.location      ?? "N/A"  },
+        { label: "Last Update", value: getTimeSince(lastSeen)           },
+        { label: "Device Code", value: deviceInfo?.device_code ?? "N/A" },
+        { label: "Location",    value: deviceInfo?.location    ?? "N/A" },
       ],
     },
     {
@@ -34,8 +34,8 @@ const DeviceInfo = () => {
       bg: connected ? "bg-blue-100" : "bg-red-100",
       color: connected ? "text-blue-500" : "text-red-500",
       rows: [
-        { label: "Status",      value: connected ? "Active" : "Inactive"    },
-        { label: "Description", value: deviceInfo?.description ?? "N/A"     },
+        { label: "Status",      value: connected ? "Active" : "Inactive" },
+        { label: "Description", value: deviceInfo?.description ?? "N/A"  },
         { label: "Registered",  value: deviceInfo?.created_at ? new Date(deviceInfo.created_at).toLocaleDateString() : "N/A" },
       ],
     },
@@ -46,30 +46,34 @@ const DeviceInfo = () => {
       bg: "bg-purple-100",
       color: "text-purple-500",
       rows: [
-        { label: "Power Mode",      value: "Performance" },
-        { label: "Backup Battery",  value: "N/A"         },
-        { label: "Est. Battery Life", value: "N/A"       },
+        { label: "Power Mode",       value: "Performance" },
+        { label: "Backup Battery",   value: "N/A"         },
+        { label: "Est. Battery Life",value: "N/A"         },
       ],
     },
   ];
 
   return (
-    <div className='w-full h-fit bg-white p-6 flex flex-col rounded-2xl shadow-lg mb-10'>
-      <h1 className='text-2xl font-bold text-left mb-6'>Device Information</h1>
-      <div className="cards flex justify-around items-center">
+    <div className="w-full bg-white p-5 sm:p-6 flex flex-col rounded-2xl shadow-lg mb-10">
+      <h1 className="text-xl sm:text-2xl font-bold text-left mb-6">Device Information</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6">
         {cards.map((card, index) => (
-          <div key={index} className="flex justify-center items-start flex-col text-left">
-            <div className="flex justify-center items-center">
-              <card.icon className={`w-12 h-12 p-3 rounded-xl mb-2 ${card.bg} ${card.color}`} />
-              <div className="flex flex-col ml-4">
-                <i className='font-semibold'>{card.name}</i>
-                <i className={`text-sm font-semibold ${card.color}`}>{card.status}</i>
+          <div key={index} className="flex flex-col gap-3 p-4 rounded-xl bg-gray-50">
+            {/* icon + name */}
+            <div className="flex items-center gap-3">
+              <card.icon className={`w-11 h-11 p-2.5 rounded-xl shrink-0 ${card.bg} ${card.color}`} />
+              <div>
+                <p className="font-semibold text-gray-800 text-sm sm:text-base">{card.name}</p>
+                <p className={`text-xs font-semibold ${card.color}`}>{card.status}</p>
               </div>
             </div>
-            <div className="flex w-[28vw] m-auto flex-col mt-2">
+
+            {/* rows */}
+            <div className="flex flex-col gap-1.5 pt-1 border-t border-gray-200">
               {card.rows.map((row, i) => (
-                <div key={i} className="text-sm text-gray-500 pb-1 flex justify-between">
-                  {row.label}: <i className='text-gray-700 font-semibold'>{row.value}</i>
+                <div key={i} className="flex justify-between text-xs sm:text-sm text-gray-500">
+                  <span>{row.label}</span>
+                  <span className="font-semibold text-gray-700 text-right ml-2 truncate max-w-[55%]">{row.value}</span>
                 </div>
               ))}
             </div>

@@ -7,110 +7,152 @@ const SensorContext = createContext(null);
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
 const DEVICE_CODE = import.meta.env.VITE_DEVICE_CODE || 'ESP-001';
 
-// compute a 0-100 comfort score from a reading
-function computeComfortScore(reading) {
-  if (!reading) return null;
-
-  const penalties = [];
-
-  // temperature: ideal 21-24
-  const t = reading.temperature;
-  if (t < 18 || t > 30) penalties.push(30);
-  else if (t < 21 || t > 24) penalties.push(10);
-
-  // humidity: ideal 40-60
-  const h = reading.humidity;
-  if (h < 20 || h > 85) penalties.push(25);
-  else if (h < 30 || h > 70) penalties.push(10);
-
-  // co2: ideal < 800
-  const c = reading.co2;
-  if (c > 2500) penalties.push(30);
-  else if (c > 1000) penalties.push(15);
-
-  // noise: ideal < 60
-  const n = reading.noise;
-  if (n > 90) penalties.push(25);
-  else if (n > 75) penalties.push(10);
-
-  const total = penalties.reduce((a, b) => a + b, 0);
-  return Math.max(0, 100 - total);
-}
-
 export function SensorProvider({ children }) {
-  const [connected, setConnected] = useState(false);
+  const [connected, setConnected]         = useState(false);
   const [latestReading, setLatestReading] = useState(null);
-  const [history, setHistory] = useState([]);
-  const [alerts, setAlerts] = useState([]);
-  const [deviceInfo, setDeviceInfo] = useState(null);
-  const [comfortScore, setComfortScore] = useState(null);
-  const [lastSeen, setLastSeen] = useState(null);
+  const [history, setHistory]             = useState([]);
+  const [alerts, setAlerts]               = useState([]);
+  const [insights, setInsights]           = useState([]);
+  const [deviceInfo, setDeviceInfo]       = useState(null);
+  const [comfortScore, setComfortScore]   = useState(null);
+  const [lastSeen, setLastSeen]           = useState(null);
+  const [unreadAlertCount, setUnreadAlertCount] = useState(0);
+  const [openExposures, setOpenExposures] = useState([]);
   const socketRef = useRef(null);
 
   useEffect(() => {
-    // fetch device info from REST
-    axios.get(`${SERVER_URL}/devices/${DEVICE_CODE}`)
+    // ── REST: device info ──────────────────────────────────────────
+    axios.get(`${SERVER_URL}/devices/${DEVICE_CODE}`, { withCredentials: true })
       .then(res => setDeviceInfo(res.data))
       .catch(err => console.error('Failed to fetch device info:', err.message));
 
-    // connect socket
-    const socket = io(SERVER_URL);
+    // ── REST: initial stats (reading + comfort + exposures) ────────
+    axios.get(`${SERVER_URL}/devices/${DEVICE_CODE}/stats`, { withCredentials: true })
+      .then(res => {
+        const d = res.data;
+        if (d.latest_reading) {
+          setLatestReading(d.latest_reading);
+        }
+        if (d.comfort_score != null) {
+          setComfortScore(d.comfort_score);
+        }
+        if (d.connected != null) setConnected(d.connected);
+        if (d.lastSeen)          setLastSeen(d.lastSeen);
+        if (d.unread_alerts)     setUnreadAlertCount(d.unread_alerts);
+        if (d.open_exposures)    setOpenExposures(d.open_exposures);
+      })
+      .catch(err => console.error('Failed to fetch device stats:', err.message));
+
+    // ── Socket.IO ──────────────────────────────────────────────────
+    const socket = io(SERVER_URL, { withCredentials: true });
     socketRef.current = socket;
 
     socket.on('connect', () => {
       console.log('Socket connected');
-      socket.emit('get-history', { quantity: 30 });
     });
 
     socket.on('disconnect', () => {
       console.log('Socket disconnected');
+      setConnected(false);
     });
 
-    // live reading from ESP32
+    socket.on('connect_error', (err) => {
+      console.error('Socket auth failed:', err.message);
+      setConnected(false);
+    });
+
+    // live reading from ESP32 — comfortScore comes from backend
     socket.on('sensor-update', (data) => {
       if (data.deviceCode !== DEVICE_CODE) return;
-      const { deviceCode, ...reading } = data;
+      const { deviceCode, comfortScore: score, timestamp, ...reading } = data;
       setLatestReading(reading);
-      setComfortScore(computeComfortScore(reading));
+      setComfortScore(score);
+      setConnected(true);
       setLastSeen(Date.now());
-
-      // append to history, keep last 100
-      setHistory(prev => {
-        const updated = [...prev, { ...reading, recorded_at: new Date().toISOString() }];
-        return updated.slice(-100);
-      });
+      setHistory(prev =>
+        [...prev, { ...reading, recorded_at: timestamp ?? new Date().toISOString() }].slice(-500)
+      );
     });
 
-    // initial + on-demand history
+    // initial history + on-demand history
     socket.on('sensor-history', (data) => {
       const deviceHistory = data[DEVICE_CODE] ?? [];
-      setHistory(deviceHistory);
       if (deviceHistory.length > 0) {
+        setHistory(deviceHistory);
         const latest = deviceHistory[deviceHistory.length - 1];
         setLatestReading(latest);
-        setComfortScore(computeComfortScore(latest));
         setLastSeen(new Date(latest.recorded_at).getTime());
       }
     });
 
-    // device connection status
+    // device connection status — handles both initial and live formats
     socket.on('esp32-status', (data) => {
-      // data can be { deviceCode, connected } (single) or { [code]: { connected } } (bulk)
       if (data.deviceCode) {
-        if (data.deviceCode === DEVICE_CODE) setConnected(data.connected);
+        // live event — flat object
+        if (data.deviceCode === DEVICE_CODE) {
+          setConnected(data.connected);
+          if (data.timestamp) setLastSeen(data.timestamp);
+        }
       } else {
+        // initial payload — keyed by device code
         const status = data[DEVICE_CODE];
-        if (status) setConnected(status.connected);
+        if (status) {
+          setConnected(status.connected);
+          if (status.lastSeen) setLastSeen(status.lastSeen);
+        }
       }
     });
 
-    // threshold + timeout alerts
+    // threshold + timeout + escalation alerts
     socket.on('alert', (data) => {
-      if (data.deviceCode !== DEVICE_CODE) return;
+      // threshold and timeout are identified by deviceCode
+      if (data.deviceCode && data.deviceCode !== DEVICE_CODE) return;
+
+      // escalation uses deviceId — we can't filter by DEVICE_CODE here easily,
+      // so we accept all escalations and let the UI show them
       setAlerts(prev => [
-        { ...data, id: Date.now(), receivedAt: Date.now() },
-        ...prev.slice(0, 49), // keep last 50
+        { ...data, id: `live-${Date.now()}`, receivedAt: Date.now() },
+        ...prev.slice(0, 49),
       ]);
+    });
+
+    // unread alert counts broadcast every 60s
+    socket.on('alert-counts', (data) => {
+      if (data[DEVICE_CODE] !== undefined) {
+        setUnreadAlertCount(data[DEVICE_CODE]);
+      }
+    });
+
+    // AI insights
+    socket.on('ai-insight', (data) => {
+      if (data.deviceCode !== DEVICE_CODE) return;
+
+      if (data.summary) {
+        // breach insight — full payload inline
+        setInsights(prev => [
+          {
+            id: data.insightId,
+            trigger_type: data.triggerType,
+            breached_fields: data.breachedFields,
+            summary: data.summary,
+            recommendation: data.recommendation,
+            severity: data.severity,
+            sensor_snapshot: data.sensorSnapshot,
+            acknowledged: false,
+            created_at: new Date().toISOString(),
+          },
+          ...prev.slice(0, 49),
+        ]);
+      } else {
+        // digest insight — fetch full content from REST
+        axios.get(`${SERVER_URL}/devices/${DEVICE_CODE}/insights?limit=1`, { withCredentials: true })
+          .then(res => {
+            if (res.data.data?.length > 0) {
+              setInsights(prev => [res.data.data[0], ...prev.slice(0, 49)]);
+            }
+          })
+          .catch(err => console.error('Failed to fetch digest insight:', err.message));
+      }
     });
 
     return () => socket.disconnect();
@@ -122,10 +164,15 @@ export function SensorProvider({ children }) {
       latestReading,
       history,
       alerts,
+      insights,
       deviceInfo,
       comfortScore,
       lastSeen,
+      unreadAlertCount,
+      openExposures,
       socket: socketRef.current,
+      DEVICE_CODE,
+      SERVER_URL,
     }}>
       {children}
     </SensorContext.Provider>
